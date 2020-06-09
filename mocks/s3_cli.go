@@ -12,9 +12,8 @@ type S3Client struct {
 // ListObjectsV2 provides a mock function with given fields: _a0
 func (_m *S3Client) List(bucket string, prefix string, delimiter string, startAfter string) (*s3.ListObjectsV2Output, error) {
 	ret := _m.Called(bucket, prefix, delimiter, startAfter)
-
 	var r0 *s3.ListObjectsV2Output
-	if rf, ok := ret.Get(0).(func(*s3.ListObjectsV2Input) *s3.ListObjectsV2Output); ok {
+	if rf, ok := ret.Get(0).(func(string,string,string,string) *s3.ListObjectsV2Output); ok {
 		r0 = rf(bucket, prefix, delimiter, startAfter)
 	} else {
 		if ret.Get(0) != nil {
@@ -23,7 +22,7 @@ func (_m *S3Client) List(bucket string, prefix string, delimiter string, startAf
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(*s3.ListObjectsV2Input) error); ok {
+	if rf, ok := ret.Get(1).(func(string,string,string,string) error); ok {
 		r1 = rf(bucket, prefix, delimiter, startAfter)
 	} else {
 		r1 = ret.Error(1)
