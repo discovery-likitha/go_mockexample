@@ -2,47 +2,26 @@ package main
 
 import (
 	"testing"
-    "fmt"
-	"github.com/aws/aws-sdk-go/aws"
+	"fmt"
+	//"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/discovery-likitha/go_mockexample/mocks_mcokery"
-	"github.com/stretchr/testify/mock"
-	//"github.com/jckuester/go-mock-examples/mocks_gomock"
+	"github.com/aws/aws-sdk-go/service/s3/s3iface"
+	"github.com/stretchr/testify/assert"
 )
 
-func TestS3ListBuckets_mockery(t *testing.T) {
-	mockS3 := &mocks_mockery.S3API{}
-
-	mockResultFn := func(input *s3.ListBucketsInput) *s3.ListBucketsOutput {
-		output := &s3.ListBucketsOutput{}
-		output.SetBuckets([]*s3.Bucket{
-			{
-				Name: aws.String("vqtf-dev-datalake-eu-west-1"),
-			},
-		})
-		return output
-	}
-    fmt.Println(mockResultFn)
-
-	mockS3.On("ListBuckets", mock.MatchedBy(func(input *s3.ListBucketsInput) bool {
-		return true
-	})).Return(mockResultFn, nil)
-
-	SomeMethod(mockS3)
+type MockedS3ListObj struct {
+	s3iface.S3API
+	Resp s3.ListObjectsV2Output
 }
-
-// func TestS3ListBuckets_gomock(t *testing.T) {
-// 	mockCtrl := gomock.NewController(t)
-// 	defer mockCtrl.Finish()
-
-// 	mockS3 := mock_s3iface.NewMockS3API(mockCtrl)
-// 	mockS3.EXPECT().ListBuckets(&s3.ListBucketsInput{}).Return(&s3.ListBucketsOutput{
-// 		Buckets: []*s3.Bucket{
-// 			{
-// 				Name: aws.String("test-bucket-gomock"),
-// 			},
-// 		},
-// 	}, nil)
-
-// 	SomeMethod(mockS3)
-// }
+func (m MockedS3ListObj) ListObjectsV2(in *s3.ListObjectsV2Input) (*s3.ListObjectsV2Output, error) {
+	// Only need to return mocked response output
+	return &m.Resp, nil
+}
+func TestS3ListOjectsMock(t *testing.T) {
+	mockSvc := &MockedS3ListObj{}
+	testcient := S3Client{ Client :mockSvc}
+	result,err := testcient.List(bucket, prefix, delimiter, startAfter)
+	fmt.Println(err)
+	fmt.Println(result)
+	assert.NoError(t, err)
+}
